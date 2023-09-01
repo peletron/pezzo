@@ -1,0 +1,115 @@
+namespace: pezzo
+pezzo:
+  defines: runnable
+  metadata:
+    name: pezzo
+    description: >-
+      A full-stack application composed of a Node.js server and a frontend
+      console app.
+    icon: https://emojiapi.dev/api/v1/globe_with_meridians.svg
+  containers:
+    pezzo:
+      build: .
+  services:
+    server-app-port:
+      container: pezzo
+      port: <- $port
+      host-port: <- $port
+      publish: false
+      protocol: TCP
+      description: Port exposed by the server application for receiving HTTP requests.
+    supertokens-port:
+      container: pezzo
+      port: 3567
+      host-port: 3567
+      publish: false
+      protocol: TCP
+      description: SuperTokens service port for authentication.
+    console-app-port:
+      container: pezzo
+      port: 4200
+      host-port: 4200
+      publish: false
+      protocol: TCP
+      description: Port exposed by the console application for serving the frontend.
+    postgres-port:
+      container: pezzo
+      port: 5433
+      host-port: 5433
+      publish: false
+      protocol: TCP
+      description: PostgreSQL database port for the database service.
+    opensearch-dashboards-port:
+      container: pezzo
+      port: 5601
+      host-port: 5601
+      publish: false
+      protocol: TCP
+      description: Port for the OpenSearch Dashboards.
+    redis-stack-server-port:
+      container: pezzo
+      port: 6379
+      host-port: 6379
+      publish: false
+      protocol: TCP
+      description: Redis Stack Server port.
+    opensearch-port:
+      container: pezzo
+      port: 9200
+      host-port: 9200
+      publish: false
+      protocol: TCP
+      description: OpenSearch service port.
+    opensearch-performance-analyzer-port:
+      container: pezzo
+      port: 9600
+      host-port: 9600
+      publish: false
+      protocol: TCP
+      description: Performance Analyzer port for OpenSearch service.
+  connections:
+    postgres:
+      target: postgresql/db
+      service: postgres
+    supertokens:
+      target: keycloak/keycloak
+      service: keycloak
+    opensearch:
+      target: rabbitmq/rabbitmq
+      service: rabbitmq-amqp-1
+  variables:
+    postgres-user:
+      env: POSTGRES_USER
+      type: string
+      description: Username for the PostgreSQL database.
+      value: postgres
+    postgres-password:
+      env: POSTGRES_PASSWORD
+      type: string
+      description: Password for the PostgreSQL database.
+      value: '!!!SETME-USE-SECRETS!!!'
+    database-url:
+      env: DATABASE_URL
+      type: string
+      description: Connection URI for the PostgreSQL database.
+      value: <- connection-hostname("postgres")
+    supertokens-connection-uri:
+      env: SUPERTOKENS_CONNECTION_URI
+      type: string
+      description: Connection URI for the SuperTokens service.
+      value: <- connection-hostname("supertokens")
+    opensearch-url:
+      env: OPENSEARCH_URL
+      type: string
+      description: URL for the OpenSearch service.
+      value: <- connection-hostname("opensearch")
+    port:
+      env: PORT
+      type: string
+      description: Port for the server application.
+      value: '3000'
+    nx-*:
+      env: NX_*
+      type: string
+      description: Environment variables injected into the console application.
+      value: '!!!SETME!!!'
