@@ -1,0 +1,62 @@
+namespace: pezzo
+pezzo:
+  defines: runnable
+  metadata:
+    name: pezzo
+    description: >-
+      Pezzo is not directly described in this task, but from context it can be
+      inferred that it's a server application with a corresponding console
+      component.
+    icon: https://emojiapi.dev/api/v1/robot.svg
+  containers:
+    pezzo:
+      build: .
+  services:
+    main-port:
+      container: pezzo
+      port: <- $port
+      host-port: <- $port
+      publish: false
+      protocol: TCP
+      description: Main port on which the server is listening.
+  connections:
+    prisma:
+      target: mongodb/mongodb
+      service: mongodb
+    mail:
+      target: nginx/basic
+      service: nginx
+    redis:
+      target: redis/redis
+      service: redis-svc
+  variables:
+    port:
+      env: PORT
+      type: int
+      description: Port on which the server is listening.
+      value: '3000'
+    prisma-url:
+      env: PRISMA_URL
+      type: string
+      description: URL of the Prisma database.
+      value: <- connection-hostname("prisma")
+    prisma-database:
+      env: PRISMA_DATABASE
+      type: string
+      description: Database name.
+      value: pezzo
+    auth-jwt-secret:
+      env: AUTH_JWT_SECRET
+      type: string
+      description: Secret for creating JWTs.
+      value: '!!!SETME-USE-SECRETS!!!'
+    mail-enabled:
+      env: MAIL_ENABLED
+      type: boolean
+      description: Flag to enable or disable mail service.
+      value: 'false'
+    redis-url:
+      env: REDIS_URL
+      type: string
+      description: URL of Redis instance.
+      value: <- connection-hostname("redis")
